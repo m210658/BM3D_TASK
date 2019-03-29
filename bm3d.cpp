@@ -187,6 +187,8 @@ int run_bm3d(
         cout << endl;
     }
 
+cout << " \nTotal available threads/real cores: (" << avail_nb_threads << "/" << avail_nb_cores << ")\n";
+
     //! Allocate plan for FFTW library
     fftwf_plan plan_2d_for_1[_nb_threads];
     fftwf_plan plan_2d_for_2[_nb_threads];
@@ -290,7 +292,7 @@ int run_bm3d(
         #pragma omp parallel shared(sub_noisy, sub_basic, w_table, h_table, \
                                     plan_2d_for_1, plan_2d_for_2, plan_2d_inv)
         {
-            #pragma omp for schedule(dynamic) nowait
+            #pragma omp for schedule(dynamic) // nowait
             for (unsigned n = 0; n < _nb_threads; n++)
             {
                 bm3d_1st_step(sigma, sub_noisy[n], sub_basic[n], w_table[n],
@@ -326,7 +328,7 @@ int run_bm3d(
                                     h_table, plan_2d_for_1, plan_2d_for_2,  \
                                     plan_2d_inv)
         {
-            #pragma omp for schedule(dynamic) nowait
+            #pragma omp for schedule(dynamic) // nowait
             for (unsigned n = 0; n < _nb_threads; n++)
             {
                 bm3d_2nd_step(sigma, sub_noisy[n], sub_basic[n], sub_denoised[n],
@@ -447,6 +449,8 @@ void bm3d_1st_step(
     vector<float> table_2D((2 * nHard + 1) * width * chnls * kHard_2, 0.0f);
 
     //! Loop on i_r
+
+
     for (unsigned ind_i = 0; ind_i < row_ind.size(); ind_i++)
     {
         const unsigned i_r = row_ind[ind_i];
@@ -464,6 +468,7 @@ void bm3d_1st_step(
         group_3D_table.clear();
 
         //! Loop on j_r
+
         for (unsigned ind_j = 0; ind_j < column_ind.size(); ind_j++)
         {
             //! Initialization
@@ -475,6 +480,11 @@ void bm3d_1st_step(
 
             //! Build of the 3D group
             vector<float> group_3D(chnls * nSx_r * kHard_2, 0.0f);
+
+// Michael Frank
+// changed to create more tasks
+
+#pragma omp for schedule(dynamic)
             for (unsigned c = 0; c < chnls; c++)
                 for (unsigned n = 0; n < nSx_r; n++)
                 {
@@ -506,6 +516,7 @@ void bm3d_1st_step(
 
         } //! End of loop on j_r
 
+
         //!  Apply 2D inverse transform
         if (tau_2D == DCT)
             dct_2d_inverse(group_3D_table, kHard, NHard * chnls * column_ind.size(),
@@ -515,6 +526,8 @@ void bm3d_1st_step(
 
         //! Registration of the weighted estimation
         unsigned dec = 0;
+
+
         for (unsigned ind_j = 0; ind_j < column_ind.size(); ind_j++)
         {
             const unsigned j_r   = column_ind[ind_j];
@@ -522,6 +535,13 @@ void bm3d_1st_step(
             const unsigned nSx_r = patch_table[k_r].size();
             for (unsigned c = 0; c < chnls; c++)
             {
+
+// Michael Frank
+// changed to create small tasks
+// commenting this pragma out reduces number of tasks by a lot
+
+#pragma omp for schedule(dynamic) // nowait
+
                 for (unsigned n = 0; n < nSx_r; n++)
                 {
                     const unsigned k = patch_table[k_r][n] + c * width * height;
@@ -671,6 +691,12 @@ void bm3d_2nd_step(
             //! Build of the 3D group
             vector<float> group_3D_est(chnls * nSx_r * kWien_2, 0.0f);
             vector<float> group_3D_img(chnls * nSx_r * kWien_2, 0.0f);
+
+// Michael Frank
+// changed to create more tasks
+
+#pragma omp for schedule(dynamic)
+
             for (unsigned c = 0; c < chnls; c++)
                 for (unsigned n = 0; n < nSx_r; n++)
                 {
@@ -719,6 +745,13 @@ void bm3d_2nd_step(
             const unsigned j_r   = column_ind[ind_j];
             const unsigned k_r   = i_r * width + j_r;
             const unsigned nSx_r = patch_table[k_r].size();
+
+// Michael Frank
+// changed to create small tasks
+// commenting this pragma out reduces number of tasks by a lot
+
+#pragma omp for schedule(dynamic) // nowait
+
             for (unsigned c = 0; c < chnls; c++)
             {
                 for (unsigned n = 0; n < nSx_r; n++)
