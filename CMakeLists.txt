@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
 project(da3d)
 
+# try our first compiler switch
+set (CMAKE_C_COMPILER $ENV{MERCURIUM}/bin/mcc)
+set (CMAKE_CXX_COMPILER $ENV{MERCURIUM}/bin/mcxx)
+
 # The build type "Release" adds some optimizations
 if (NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE "Release")
@@ -14,8 +18,8 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-q")
   endif ()
   # Optimize to the current CPU and enable warnings
-  set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native -Wall -Wextra")
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wall -Wextra")
+  set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -k -O3 -march=native -Wall -Wextra")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -k -O3 -march=native -Wall -Wextra")
 endif ()
 
 # Enable C99
@@ -28,6 +32,10 @@ endif ()
 # Enable OpenMP
 find_package (OpenMP)
 if(OPENMP_FOUND)
+  # fix me -- this is a hack to pass the right switch
+  set (OpenMP_CXX_FLAGS "--ompss")
+  set (OpenMP_C_FLAGS "--ompss")
+  #
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
   set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 endif()

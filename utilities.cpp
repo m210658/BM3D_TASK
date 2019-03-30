@@ -282,7 +282,7 @@ void sub_divide(
                 }
             }
     }
-    else //! Reconstruction of the image
+    else //! Reconstruction of the image 262144
     {
         for (unsigned i = 0; i < nh; i++)
             for (unsigned j = 0; j < nw; j++)
@@ -298,7 +298,10 @@ void sub_divide(
                     {
                         unsigned dq = dc + p * w;
                         for (unsigned q = 0; q < w - 2 * N; q++, dq++)
-                            img[dc_2 + p * width + q] = sub_img[k][dq];
+			{
+			    unsigned pv = dc_2 + p * width + q;
+                            img[pv] = sub_img[k][dq];
+			}
                     }
                 }
             }
@@ -684,7 +687,9 @@ void allocate_plan_1d(
 ,   const unsigned nb
 ){
     int nb_table[1] = {N};
-    int nembed[1]   = {N * nb};
+
+
+    int nembed[1]   = {(int) N * (int) nb};
     fftwf_r2r_kind kind_table[1] = {kind};
 
     float* vec = (float*) fftwf_malloc(N * nb * sizeof(float));
