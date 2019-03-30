@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
 project(da3d)
 
-# try our first compiler switch
+# ----------------- Michael Frank
+# set compiler switch:
+# to use BSC Mercurium compiler these variables have to be set to a different default
+
 set (CMAKE_C_COMPILER $ENV{MERCURIUM}/bin/mcc)
 set (CMAKE_CXX_COMPILER $ENV{MERCURIUM}/bin/mcxx)
 
@@ -17,7 +20,13 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wa,-q")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-q")
   endif ()
+  # ------------------ Michael Frank
   # Optimize to the current CPU and enable warnings
+  # modified these to build for Mercurium with flags -g to add symbols for debugging
+  # and -k to keep Mercurium output files to allow gdb to access source code
+  # This may be modified if there is no need for these to flags
+  # I also added the -std switch to select C++ 2011 standard over the default C++ 1998
+  # ---------------------------------
   set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -k -O3 -march=native -Wall -Wextra")
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -k -O3 -march=native -Wall -Wextra")
 endif ()

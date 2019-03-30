@@ -187,7 +187,11 @@ int run_bm3d(
         cout << endl;
     }
 
-cout << " \nTotal available threads/real cores: (" << avail_nb_threads << "/" << avail_nb_cores << ")\n";
+//
+// Michael Frank
+// added this print statement while debugging
+//
+    cout << " \nTotal available threads/real cores: (" << avail_nb_threads << "/" << avail_nb_cores << ")\n";
 
     //! Allocate plan for FFTW library
     fftwf_plan plan_2d_for_1[_nb_threads];
@@ -485,6 +489,7 @@ void bm3d_1st_step(
 // changed to create more tasks
 
 #pragma omp for schedule(dynamic)
+
             for (unsigned c = 0; c < chnls; c++)
                 for (unsigned n = 0; n < nSx_r; n++)
                 {
@@ -540,7 +545,7 @@ void bm3d_1st_step(
 // changed to create small tasks
 // commenting this pragma out reduces number of tasks by a lot
 
-#pragma omp for schedule(dynamic) // nowait
+#pragma omp for schedule(dynamic)
 
                 for (unsigned n = 0; n < nSx_r; n++)
                 {
@@ -750,7 +755,7 @@ void bm3d_2nd_step(
 // changed to create small tasks
 // commenting this pragma out reduces number of tasks by a lot
 
-#pragma omp for schedule(dynamic) // nowait
+#pragma omp for schedule(dynamic)
 
             for (unsigned c = 0; c < chnls; c++)
             {

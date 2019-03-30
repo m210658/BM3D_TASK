@@ -1,5 +1,23 @@
 % BM3D image denoising.
 
+***
+*** the BSC OmpSs package has to be installed to compile and run this application
+*** 
+*** here are the environment variables that I added to my .profile during the installation of OmpSs
+
+	export TARGET="/usr/local/bsctools"
+	export MPI_HOME="/usr"
+	export MPICC="/usr/bin/mpicc"
+	export MERCURIUM="/usr/local/bsctools/mercurium"
+	PATH="$PATH:$TARGET/bin:$MERCURIUM/bin"
+	export NX_ARGS='--verbose --summary'
+
+*** I have modified:
+***     CMakeLists.txt --- the prototype for the Makefile generation
+***     bm3d.cpp       --- added additional #pragma at 4 places to parallelize/taskify loops
+*** 			   added a print statement to print how many real threads are running
+
+
 # ABOUT
 
 * Author    : Marc Lebrun <marc.lebrun@cmla.ens-cachan.fr>
